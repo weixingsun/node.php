@@ -156,12 +156,18 @@ function node_serve($path = "") {
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $str_json_params);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             }else{
+                //$str_header = implode(",", $headers);
                 $fields = http_build_query($_POST);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
-                //$str_header = implode(",", $headers);
                 //error_log("post json=$str_json_params ");
             }
-        }
+        } else if($_SERVER["REQUEST_METHOD"] === "PUT" || $_SERVER["REQUEST_METHOD"] === "DELETE"){
+	    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $_SERVER["REQUEST_METHOD"]);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	}
+        //error_log("url=$url");
  	$resp = curl_exec($curl);
 	if($resp === false) {
 		node_head();
@@ -204,11 +210,15 @@ function node_dispatch() {
 		}
 		node_foot();
 	} else {
-		if(isset($_GET['path'])) {
+		$full_url = $_SERVER['REQUEST_URI'];
+                $path = explode("?path=",$full_url);
+		//error_log("path=$path[1]");
+		node_serve($path[1]);
+		/*if(isset($_GET['path'])) {
 			node_serve($_GET['path']);
 		} else {
 			node_serve();
-		}
+		}*/
 	}
 }
 
