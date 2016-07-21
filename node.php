@@ -6,13 +6,18 @@
  * MIT License
  */
 
+//change ADMIN_MODE=true
+//wget http://download.redis.io/releases/redis-3.2.1.tar.gz && tar zxf redis-3.2.1.tar.gz && cd redis-3.2.1 && make && src/redis-server #start redis on 127.0.0.1:6379
+//git clone https://github.com/weixingsun/docker-redis.git && $HOST/service/node.php?start=docker-redis/src/main.js  #start nodejs server
+//change ADMIN_MODE=false
+//wget $HOST/service/node.php?path=api/msg/car:1,2:3
 error_reporting(E_ALL);
 
 set_time_limit(120);
 
 define("ADMIN_MODE", false); //set to true to allow unsafe operations, set back to false when finished
 
-define("NODE_VER", "v5.7.0");
+define("NODE_VER", "v6.3.0");
 
 define("NODE_ARCH", "x" . substr(php_uname("m"), -2)); //x86 or x64
 
@@ -23,6 +28,22 @@ define("NODE_URL", "http://nodejs.org/dist/" . NODE_VER . "/" . NODE_FILE);
 define("NODE_DIR", "node");
 
 define("NODE_PORT", 49999);
+
+if (!function_exists('getallheaders'))
+{
+    function getallheaders()
+    {
+           $headers = '';
+       foreach ($_SERVER as $name => $value)
+       {
+           if (substr($name, 0, 5) == 'HTTP_')
+           {
+               $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+           }
+       }
+       return $headers;
+    }
+}
 
 function node_install() {
 	if(file_exists(NODE_DIR)) {
